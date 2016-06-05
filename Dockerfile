@@ -13,7 +13,9 @@ ENV PATH $PATH:node_modules/.bin
 ## Install Java
 ##
 RUN DEBIAN_FRONTEND=noninteractive apt-get update -q && \
-	apt-get install -qy --no-install-recommends sudo default-jdk yes
+	apt-get install -qy --no-install-recommends sudo default-jdk
+
+COPY tools /opt/tools
 
 ##
 ## Install Android SDK
@@ -42,13 +44,9 @@ RUN cd /usr/local && \
 
 # Install android tools and system-image.
 
-ENV PATH $PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/23.0.1
-RUN yes | android update sdk \
-    --no-ui \
-    --force \
-    --all \
-    --filter platform-tools,android-23,build-tools-23.0.1,extra-android-support,extra-android-m2repository,sys-img-x86_64-android-23,extra-google-m2repository
 
+ENV PATH $PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/23.0.1
+RUN ["/opt/tools/android-accept-licenses.sh", "android update sdk --all --no-ui --filter platform-tools,android-23,build-tools-23.0.1,extra-android-support,extra-android-m2repository,sys-img-x86_64-android-23,extra-google-m2repository"]
 
 ##
 ## Install react native
