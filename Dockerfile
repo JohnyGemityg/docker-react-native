@@ -13,7 +13,7 @@ ENV PATH $PATH:node_modules/.bin
 ## Install Java
 ##
 RUN DEBIAN_FRONTEND=noninteractive apt-get update -q && \
-	apt-get install -qy --no-install-recommends sudo default-jdk
+	apt-get install -qy --no-install-recommends sudo default-jdk yes
 
 ##
 ## Install Android SDK
@@ -43,7 +43,7 @@ RUN cd /usr/local && \
 # Install android tools and system-image.
 
 ENV PATH $PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/23.0.1
-RUN echo "y" | android update sdk \
+RUN yes | android update sdk \
     --no-ui \
     --force \
     --all \
