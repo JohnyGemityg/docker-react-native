@@ -15,8 +15,6 @@ ENV PATH $PATH:node_modules/.bin
 RUN DEBIAN_FRONTEND=noninteractive apt-get update -q && \
 	apt-get install -qy --no-install-recommends sudo default-jdk
 
-COPY tools /opt/tools
-
 ##
 ## Install Android SDK
 ##
@@ -44,9 +42,15 @@ RUN cd /usr/local && \
 
 # Install android tools and system-image.
 
-
 ENV PATH $PATH:$ANDROID_HOME/tools:$ANDROID_HOME/platform-tools:$ANDROID_HOME/build-tools/23.0.1
+
+RUN apt-get install expect -y --force-yes
+COPY tools /opt/tools
 RUN ["/opt/tools/android-accept-licenses.sh", "android update sdk --all --no-ui --filter platform-tools,android-23,build-tools-23.0.1,extra-android-support,extra-android-m2repository,sys-img-x86_64-android-23,extra-google-m2repository"]
+
+#Download better node
+RUN npm install -g n
+RUN n stable
 
 ##
 ## Install react native
@@ -73,6 +77,9 @@ RUN adduser --disabled-password --gecos '' $USERNAME && \
 # Create android avd image
 # RUN echo "no" | android create avd -n android-23-phone -c 1000M -s WVGA854 -t 1
 
+# Tell gradle to store dependencies in a sub directory of the android project
+# this persists the dependencies between builds
+ENV GRADLE_USER_HOME /home/$USERNAME/app/android/gradle_deps
 
 USER $USERNAME
 
@@ -80,6 +87,4 @@ USER $USERNAME
 # You'll need to run this image with a volume mapped to /home/dev (i.e. -v $(pwd):/home/dev) or override this value
 WORKDIR /home/$USERNAME/app
 
-# Tell gradle to store dependencies in a sub directory of the android project
-# this persists the dependencies between builds
-ENV GRADLE_USER_HOME /home/$USERNAME/app/android/gradle_deps
+
